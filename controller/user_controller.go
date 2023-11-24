@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/helper"
-	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/middleware"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/input"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/entity"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/response"
