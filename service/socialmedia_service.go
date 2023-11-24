@@ -41,7 +41,7 @@ func (s *socialmediaService) CreateSocialMedia(input input.SocialInput, idUser i
 }
 
 func (s *socialmediaService) GetSocialMedia() ([]entity.SocialMedia, error) {
-	socialmedia, err := s.socialmediaRepository..GetAll()
+	socialmedia, err := s.socialmediaRepository.GetAll()
 
 	if err != nil {
 		return []entity.SocialMedia{}, err
