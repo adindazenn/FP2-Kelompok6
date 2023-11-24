@@ -13,6 +13,7 @@ import (
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/service"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/config"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -190,11 +191,11 @@ func (h *userController) UpdateUser(c *gin.Context) {
     }
 
     // Update informasi akun user
-    user.FullName = request.FullName
+    user.Username = request.Username
     user.Email = request.Email
 
     // Lakukan update data user dalam database
-	_, err = h.userService.UpdateUser(user.ID, inputUserUpdate)
+	_, err = h.userService.UpdateUser(user.ID, request)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -204,18 +205,12 @@ func (h *userController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	userUpdated, err := h.userService.GetUserByID(id_user)
-	if err != nil {
-		response := helper.APIResponse("failed", "Cannot fetch user!")
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
-
     // Response data user yang telah diperbarui
     updateResponse := response.UserUpdateResponse{
         ID:        user.ID,
-        FullName:  user.FullName,
+        Username:  user.Username,
         Email:     user.Email,
+	Age:       user.Age,
         UpdatedAt: user.UpdatedAt,
     }
     c.JSON(http.StatusCreated, updateResponse)
@@ -240,21 +235,9 @@ func (h *userController) DeleteUser(c *gin.Context) {
 	}
 
 	deleteResponse := response.UserDeleteResponse{
-		Message: "Your account has been successfully deleted with id " + fmt.Sprint(user.ID) + "!",
+		Message: "Your account has been successfully deleted with id " + fmt.Sprint(userDelete.ID) + "!",
 	}
 
 	response := helper.APIResponse("ok", deleteResponse)
 	c.JSON(http.StatusOK, response)
-}
-
-
-func (h *userController) TestUser(c *gin.Context) {
-	id_user, err := c.Get("currentUser")
-
-	if !err {
-		c.JSON(http.StatusNotFound, helper.APIResponse("not created", err))
-		return
-	}
-
-	c.JSON(http.StatusOK, helper.APIResponse("created", id_user))
 }
