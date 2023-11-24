@@ -26,12 +26,13 @@ func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 	var input input.SocialInput
 
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser, err := GetUserFromToken(c)
-	    if err != nil {
+	    currentUser, tokenErr := GetUserFromToken(c)
+	    if tokenErr != nil {
 	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 	        return
 	    }
 
+	err := c.ShouldBindJSON(&input)
 	socialmedia, err := govalidator.ValidateStruct(input)
 
 	if !socialmedia {
@@ -67,13 +68,15 @@ func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 // Delete Social Media by id
 func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser, err := GetUserFromToken(c)
-	    if err != nil {
+	    currentUser, tokenErr := GetUserFromToken(c)
+	    if tokenErr != nil {
 	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 	        return
 	    }
 
 	var idSocialMediaUri input.DeleteSocialMedia
+
+	err := c.ShouldBindUri(&idSocialMediaUri)
 
 	socialmedia, err := govalidator.ValidateStruct(idSocialMediaUri)
 
@@ -114,8 +117,8 @@ func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 // Get All Social Medias
 func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser, err := GetUserFromToken(c)
-	    if err != nil {
+	    _, tokenErr := GetUserFromToken(c)
+	    if tokenErr != nil {
 	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 	        return
 	    }
@@ -155,13 +158,15 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 // Edit/Update Social Media (Name or URL)
 func (h *socialmediaController) UpdateSocialMedia(c *gin.Context) {
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser, err := GetUserFromToken(c)
-	    if err != nil {
+	    currentUser, tokenErr := GetUserFromToken(c)
+	    if tokenErr != nil {
 	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 	        return
 	    }
 
 	update := input.SocialInput{}
+
+	err := c.ShouldBindJSON(&update)
 
 	socialmedia, err := govalidator.ValidateStruct(update)
 
