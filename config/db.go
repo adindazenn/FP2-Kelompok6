@@ -9,17 +9,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	host		= os.Getenv("PGHOST")
-	user		= os.Getenv("PGUSER")
-	password	= os.Getenv("PGPASSWORD")
-	port		= os.Getenv("PGPORT")
-	dbname		= os.Getenv("PGDATABASE")
-)
-
 func InitDB() *gorm.DB {
 
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	dsn := "host=" + os.Getenv("PGHOST") + " user=" + os.Getenv("PGUSER") + " password=" + os.Getenv("PGPASSWORD") + " dbname=" + os.Getenv("PGDATABASE") + " port=" + os.Getenv("PGPORT") + " sslmode=disable TimeZone=Asia/Jakarta"
 	var err error
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
