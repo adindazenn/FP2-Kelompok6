@@ -3,12 +3,15 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"errors"
 
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/helper"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/middleware"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/input"
+	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/entity"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/response"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/service"
+	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/config"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
@@ -21,6 +24,50 @@ type userController struct {
 
 func NewUserController(userService service.UserService) *userController {
 	return &userController{userService}
+}
+
+func GetUserFromToken(c *gin.Context) (*entity.User, error) {
+    db, err := config.InitDB()
+    if err != nil {
+        fmt.Println("Error initializing database:", err)
+        return nil, err
+    }
+    
+    // Mendapatkan token dari header Authorization
+    authHeader := c.GetHeader("Authorization")
+    if authHeader == "" {
+        return nil, errors.New("Token JWT tidak ditemukan")
+    }
+
+    // Menghapus "Bearer " dari token
+    tokenString := authHeader[len("Bearer "):]
+
+    // Memeriksa dan memverifikasi token
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        return []byte("password"), nil
+    })
+
+    if err != nil {
+        return nil, err
+    }
+
+    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+        // Mendapatkan user_id dari klaim token
+        user_id, ok := claims["user_id"].(float64)
+        if !ok {
+            return nil, errors.New("User ID tidak valid")
+        }
+
+        // Temukan pengguna berdasarkan user_id
+        var user entity.User
+        if err := db.Where("id = ?", int(user_id)).First(&user).Error; err != nil {
+            return nil, err
+        }
+
+        return &user, nil
+    } else {
+        return nil, errors.New("Token JWT tidak valid")
+    }
 }
 
 func (h *userController) RegisterUser(c *gin.Context) {
@@ -128,45 +175,26 @@ func (h *userController) Login(c *gin.Context) {
 }
 
 func (h *userController) UpdateUser(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(int)
+    // Get user yang terotentikasi dari token JWT
+    user, err := GetUserFromToken(c)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+        return
+    }
 
-	var inputUserUpdate input.UserUpdateInput
+    // Parse data permintaan update akun
+    var request input.UserUpdateInput
+    if err := c.ShouldBindJSON(&request); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	err := c.ShouldBindJSON(&inputUserUpdate)
+    // Update informasi akun user
+    user.FullName = request.FullName
+    user.Email = request.Email
 
-	user, err := govalidator.ValidateStruct(inputUserUpdate)
-
-	if !user {
-		response := helper.APIResponse("failed", gin.H{
-			"errors": err.Error(),
-		})
-		c.JSON(http.StatusBadRequest, response)
-		fmt.Println("error: " + err.Error())
-		return
-	}
-
-	var idUserUri input.UserUpdateID
-
-	err = c.ShouldBindUri(&idUserUri)
-
-	if currentUser != idUserUri.ID {
-		response := helper.APIResponse("failed", "unauthorized user")
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
-
-	if err != nil {
-		errorMessages := helper.FormatValidationError(err)
-		response := helper.APIResponse("failed", gin.H{
-			"errors": errorMessages,
-		})
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
-
-	id_user := idUserUri.ID
-
-	_, err = h.userService.UpdateUser(id_user, inputUserUpdate)
+    // Lakukan update data user dalam database
+	_, err = h.userService.UpdateUser(user.ID, inputUserUpdate)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -183,41 +211,25 @@ func (h *userController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	updateResponse := response.UserUpdateResponse{
-		ID:        userUpdated.ID,
-		Email:     userUpdated.Email,
-		Username:  userUpdated.Username,
-		Age:       userUpdated.Age,
-		UpdatedAt: userUpdated.UpdatedAt,
-	}
-
-	response := helper.APIResponse("ok", updateResponse)
-	c.JSON(http.StatusOK, response)
+    // Response data user yang telah diperbarui
+    updateResponse := response.UserUpdateResponse{
+        ID:        user.ID,
+        FullName:  user.FullName,
+        Email:     user.Email,
+        UpdatedAt: user.UpdatedAt,
+    }
+    c.JSON(http.StatusCreated, updateResponse)
 }
 
 func (h *userController) DeleteUser(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(int)
-
-	var idUserUri input.UserDeleteID
-
-	err := c.ShouldBindUri(&idUserUri)
-
-	if currentUser != idUserUri.ID {
-		response := helper.APIResponse("failed", "unauthorized user")
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
-
+	// Get user yang terotentikasi dari token JWT
+	user, err := GetUserFromToken(c)
 	if err != nil {
-		errorMessages := helper.FormatValidationError(err)
-		response := helper.APIResponse("failed", gin.H{
-			"errors": errorMessages,
-		})
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 		return
 	}
 
-	userDelete, err := h.userService.DeleteUser(idUserUri.ID)
+	userDelete, err := h.userService.DeleteUser(user.ID)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -228,12 +240,13 @@ func (h *userController) DeleteUser(c *gin.Context) {
 	}
 
 	deleteResponse := response.UserDeleteResponse{
-		Message: "Your account has been successfully deleted with id " + fmt.Sprint(userDelete.ID) + "!",
+		Message: "Your account has been successfully deleted with id " + fmt.Sprint(user.ID) + "!",
 	}
 
 	response := helper.APIResponse("ok", deleteResponse)
 	c.JSON(http.StatusOK, response)
 }
+
 
 func (h *userController) TestUser(c *gin.Context) {
 	id_user, err := c.Get("currentUser")
