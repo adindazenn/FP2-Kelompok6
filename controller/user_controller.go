@@ -38,6 +38,13 @@ func (h *userController) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if input.Age <= 8 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Errors": "Age must be above 8",
+		})
+		return
+	}
+
 	result, err := h.userService.CreateUser(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
