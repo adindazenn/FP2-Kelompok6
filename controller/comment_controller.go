@@ -138,7 +138,7 @@ func (h *commentController) GetComment(c *gin.Context) {
 	// Query Photo
 	var allCommentsPhoto []response.GetCommentResponse
 	for _, item := range comments {
-		userTmp, _ := h.userService.GetUserByID(index.UserID)
+		userTmp, _ := h.userService.GetUserByID(item.UserID)
 		photo, _ := h.photoService.GetPhotoByID(item.PhotoID)
 		
 		allCommentsPhotoTmp := response.GetAllComment(item, photo, userTmp)
