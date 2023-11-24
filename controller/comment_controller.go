@@ -17,6 +17,7 @@ import (
 type commentController struct {
 	commentService service.CommentService
 	photoService   service.PhotoService
+	userService    service.UserService
 }
 
 func NewCommentController(commentService service.CommentService, photoService service.PhotoService) *commentController {
