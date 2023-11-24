@@ -32,8 +32,6 @@ func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 	        return
 	    }
 
-	err := c.ShouldBindJSON(&input)
-
 	socialmedia, err := govalidator.ValidateStruct(input)
 
 	if !socialmedia {
@@ -45,7 +43,7 @@ func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 	}
 
 	// Send To Service
-	newSocialMedia, err := h.socialmediaService.CreateSocialMedia(input, currentUser)
+	newSocialMedia, err := h.socialmediaService.CreateSocialMedia(input, currentUser.ID)
 
 	if err != nil {
 
@@ -97,7 +95,7 @@ func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 		return
 	}
 
-	_, err = h.socialmediaService.DeleteSocialMedia(currentUser, idSocialMedia)
+	_, err = h.socialmediaService.DeleteSocialMedia(currentUser.ID, idSocialMedia)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -124,7 +122,7 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 	        return
 	    }
 
-	socialmedia, err := h.socialmediaService.GetSocialMedia(currentUser)
+	socialmedia, err := h.socialmediaService.GetSocialMedia(currentUser.ID)
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
 			"errors": err.Error(),
@@ -133,7 +131,7 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.GetUserByID(currentUser)
+	user, err := h.userService.GetUserByID(currentUser.ID)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -167,8 +165,6 @@ func (h *socialmediaController) UpdateSocialMedia(c *gin.Context) {
 
 	update := input.SocialInput{}
 
-	err := c.ShouldBindJSON(&update)
-
 	socialmedia, err := govalidator.ValidateStruct(update)
 
 	if !socialmedia {
@@ -194,7 +190,7 @@ func (h *socialmediaController) UpdateSocialMedia(c *gin.Context) {
 
 	id_socialmedia := idSocialUri.ID
 
-	_, err = h.socialmediaService.UpdateSocialMedia(currentUser, id_socialmedia, update)
+	_, err = h.socialmediaService.UpdateSocialMedia(currentUser.ID, id_socialmedia, update)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
