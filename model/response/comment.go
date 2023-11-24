@@ -39,7 +39,7 @@ type CommentPhoto struct {
 	UserID   int    `json:"user_id"`
 }
 
-func GetAllComment(comment entity.Comment, photo entity.Photo) GetCommentResponse {
+func GetAllComment(comment entity.Comment, photo entity.Photo, user entity.User) GetCommentResponse {
 	response := GetCommentResponse{
 		ID:        comment.ID,
 		Message:   comment.Message,
