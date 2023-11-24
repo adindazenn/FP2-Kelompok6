@@ -36,7 +36,7 @@ func main() {
 
 	commentRepository := repository.NewCommentRepository(db)
 	commentService := service.NewCommentService(commentRepository, photoRepository)
-	commentController := controller.NewCommentController(commentService, photoService)
+	commentController := controller.NewCommentController(commentService, photoService, userService)
 
 	socialmediaRepository := repository.NewSocialMediaRepository(db)
 	socialmediaService := service.NewSocialMediaService(socialmediaRepository)
