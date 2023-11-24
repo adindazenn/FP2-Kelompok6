@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"errors"
+	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type Service interface {
@@ -20,10 +21,12 @@ func NewService() *jwtService {
 }
 
 func (s *jwtService) GenerateToken(userID int) (string, error) {
-	claim := jwt.MapClaims{}
-	claim["id_user"] = userID
+	claims := jwt.MapClaims{
+		"id_user": userID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Token expiration time
+	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	signedToken, err := token.SignedString(SECRET_KEY)
 
@@ -36,12 +39,10 @@ func (s *jwtService) GenerateToken(userID int) (string, error) {
 
 func (s *jwtService) ValidateToken(encodedToken string) (*jwt.Token, error) {
 	token, err := jwt.Parse(encodedToken, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-
-		if !ok {
+		// Validate the signing method used in the token
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid token")
 		}
-
 		return []byte(SECRET_KEY), nil
 	})
 
