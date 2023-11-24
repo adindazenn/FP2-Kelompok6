@@ -25,14 +25,13 @@ func (h *photoController) AddNewPhoto(c *gin.Context) {
 	var input input.PhotoCreateInput
 
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser:= GetUserFromToken(c)
-	if currentUser == 0 {
-		response := helper.APIResponse("failed", "unauthorized user")
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
+	    currentUser, err := GetUserFromToken(c)
+	    if err != nil {
+	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+	        return
+	    }
 
-	err := c.ShouldBindJSON(&input)
+	//err := c.ShouldBindJSON(&input)
 
 	photo, err := govalidator.ValidateStruct(input)
 
