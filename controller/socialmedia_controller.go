@@ -115,23 +115,13 @@ func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 // Get All Social Medias
 func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 	// Get user yang terotentikasi dari token JWT
-	currentUser, tokenErr := GetUserFromToken(c)
+	_, tokenErr := GetUserFromToken(c)
 	if tokenErr != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 		return
 	}
 
-	socialmedia, err := h.socialmediaService.GetSocialMedia(currentUser.ID)
-	if err != nil {
-		response := helper.APIResponse("failed", gin.H{
-			"errors": err.Error(),
-		})
-		c.JSON(http.StatusUnprocessableEntity, response)
-		return
-	}
-
-	user, err := h.userService.GetUserByID(currentUser.ID)
-
+	socialmedia, err := h.socialmediaService.GetSocialMedia()
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
 			"errors": err.Error(),
