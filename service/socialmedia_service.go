@@ -12,7 +12,7 @@ type SocialMediaService interface {
 	CreateSocialMedia(input input.SocialInput, idUser int) (entity.SocialMedia, error)
 	DeleteSocialMedia(id_user int, id_socialmedia int) (entity.SocialMedia, error)
 	UpdateSocialMedia(id_user int, id_socialmedia int, input input.SocialInput) (entity.SocialMedia, error)
-	GetSocialMedia(UserID int) ([]entity.SocialMedia, error)
+	GetSocialMedia() ([]entity.SocialMedia, error)
 	GetSocialMediaByID(idSocialMedia int) (entity.SocialMedia, error)
 }
 type socialmediaService struct {
@@ -40,8 +40,8 @@ func (s *socialmediaService) CreateSocialMedia(input input.SocialInput, idUser i
 
 }
 
-func (s *socialmediaService) GetSocialMedia(UserID int) ([]entity.SocialMedia, error) {
-	socialmedia, err := s.socialmediaRepository.FindByUserID(UserID)
+func (s *socialmediaService) GetSocialMedia() ([]entity.SocialMedia, error) {
+	socialmedia, err := s.socialmediaRepository..GetAll()
 
 	if err != nil {
 		return []entity.SocialMedia{}, err
