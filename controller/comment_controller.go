@@ -47,7 +47,7 @@ func (h *commentController) AddNewComment(c *gin.Context) {
 	}
 
 	// Send To Service
-	newComment, err := h.commentService.CreateComment(input, currentUser)
+	newComment, err := h.commentService.CreateComment(input, currentUser.ID)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -100,7 +100,7 @@ func (h *commentController) DeleteComment(c *gin.Context) {
 		return
 	}
 
-	_, err = h.commentService.DeleteComment(currentUser, idComment)
+	_, err = h.commentService.DeleteComment(currentUser.ID, idComment)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -127,7 +127,7 @@ func (h *commentController) GetComment(c *gin.Context) {
 	        return
 	    }
 
-	comments, err := h.commentService.GetComment(currentUser)
+	comments, err := h.commentService.GetComment(currentUser.ID)
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
 			"errors": err.Error(),
@@ -187,7 +187,7 @@ func (h *commentController) UpdateComment(c *gin.Context) {
 
 	id_comment := idCommentUri.ID
 
-	_, err = h.commentService.UpdateComment(currentUser, id_comment, UpdateComment)
+	_, err = h.commentService.UpdateComment(currentUser.ID, id_comment, UpdateComment)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
