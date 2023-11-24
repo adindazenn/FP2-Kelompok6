@@ -130,7 +130,7 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 		return
 	}
 
-	var socialmediaResponse response.[]SocialMediaGetResponse
+	var socialmediaResponse []response.SocialMediaGetResponse
 	for _, index := range socialmedia {
 		userTmp, _ := h.userService.GetUserByID(index.UserID)
 	
