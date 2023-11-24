@@ -119,13 +119,13 @@ func (h *commentController) DeleteComment(c *gin.Context) {
 // Get Comment All Comment
 func (h *commentController) GetComment(c *gin.Context) {
 	// Get user yang terotentikasi dari token JWT
-	currentUser, tokenErr := GetUserFromToken(c)
+	_, tokenErr := GetUserFromToken(c)
 	if tokenErr != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 		return
 	}
 
-	comments, err := h.commentService.GetComment(currentUser.ID)
+	comments, err := h.commentService.GetCommentAll()
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
 			"errors": err.Error(),
@@ -137,9 +137,10 @@ func (h *commentController) GetComment(c *gin.Context) {
 	// Query Photo
 	var allCommentsPhoto []response.GetCommentResponse
 	for _, item := range comments {
+		userTmp, _ := h.userService.GetUserByID(index.UserID)
 		photo, _ := h.photoService.GetPhotoByID(item.PhotoID)
-		allCommentsPhotoTmp := response.GetAllComment(item, photo)
-
+		
+		allCommentsPhotoTmp := response.GetAllComment(item, photo, userTmp)
 		allCommentsPhoto = append(allCommentsPhoto, allCommentsPhotoTmp)
 	}
 
