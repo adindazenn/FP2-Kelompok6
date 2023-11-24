@@ -146,9 +146,8 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 				Username: userTmp.Username,
 			},
 		}
+		socialmediaResponse = append(socialmediaResponse, socialmediaResponseTmp)
 	}
-	socialmediaResponse = append(socialmediaResponse, socialmediaResponseTmp)
-
 	c.JSON(http.StatusOK, gin.H{
 		"social_medias": socialmediaResponse,
 	})
