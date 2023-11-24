@@ -95,7 +95,7 @@ func (h *photoController) DeletePhoto(c *gin.Context) {
 		return
 	}
 
-	_, err = h.photoService.DeletePhoto(idPhoto, currentUser)
+	_, err = h.photoService.DeletePhoto(idPhoto, currentUser.ID)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -115,7 +115,7 @@ func (h *photoController) DeletePhoto(c *gin.Context) {
 
 func (h *photoController) GetPhotos(c *gin.Context) {
 	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
+	    _, tokenErr := GetUserFromToken(c)
 	    if tokenErr != nil {
 	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
 	        return
@@ -251,7 +251,7 @@ func (h *photoController) UpdatePhoto(c *gin.Context) {
 
 	id_photo := idPhotoUri.ID
 
-	_, err = h.photoService.UpdatePhoto(currentUser, id_photo, updatePhoto)
+	_, err = h.photoService.UpdatePhoto(currentUser.ID, id_photo, updatePhoto)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
