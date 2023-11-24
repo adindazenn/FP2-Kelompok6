@@ -1,19 +1,19 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
-	"errors"
 
+	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/config"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/helper"
-	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/input"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/entity"
+	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/input"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/response"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/service"
-	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/config"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/asaskevich/govalidator"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,42 +27,42 @@ func NewUserController(userService service.UserService) *userController {
 }
 
 func GetUserFromToken(c *gin.Context) (*entity.User, error) {
-    db := config.InitDB()    
-    // Mendapatkan token dari header Authorization
-    authHeader := c.GetHeader("Authorization")
-    if authHeader == "" {
-        return nil, errors.New("Token JWT tidak ditemukan")
-    }
+	db := config.InitDB()
+	// Mendapatkan token dari header Authorization
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		return nil, errors.New("Token JWT tidak ditemukan")
+	}
 
-    // Menghapus "Bearer " dari token
-    tokenString := authHeader[len("Bearer "):]
+	// Menghapus "Bearer " dari token
+	tokenString := authHeader[len("Bearer "):]
 
-    // Memeriksa dan memverifikasi token
-    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        return []byte("password"), nil
-    })
+	// Memeriksa dan memverifikasi token
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte("password"), nil
+	})
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-        // Mendapatkan user_id dari klaim token
-        user_id, ok := claims["user_id"].(float64)
-        if !ok {
-            return nil, errors.New("User ID tidak valid")
-        }
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// Mendapatkan user_id dari klaim token
+		user_id, ok := claims["user_id"].(float64)
+		if !ok {
+			return nil, errors.New("User ID tidak valid")
+		}
 
-        // Temukan pengguna berdasarkan user_id
-        var user entity.User
-        if err := db.Where("id = ?", int(user_id)).First(&user).Error; err != nil {
-            return nil, err
-        }
+		// Temukan pengguna berdasarkan user_id
+		var user entity.User
+		if err := db.Where("id = ?", int(user_id)).First(&user).Error; err != nil {
+			return nil, err
+		}
 
-        return &user, nil
-    } else {
-        return nil, errors.New("Token JWT tidak valid")
-    }
+		return &user, nil
+	} else {
+		return nil, errors.New("Token JWT tidak valid")
+	}
 }
 
 func (h *userController) RegisterUser(c *gin.Context) {
@@ -102,8 +102,7 @@ func (h *userController) RegisterUser(c *gin.Context) {
 		Username: result.Username,
 	}
 
-	response := helper.APIResponse("created", registerResponse)
-	c.JSON(201, response)
+	c.JSON(201, registerResponse)
 }
 
 func (h *userController) Login(c *gin.Context) {
@@ -151,46 +150,45 @@ func (h *userController) Login(c *gin.Context) {
 		return
 	}
 
-	    // Buat token JWT
-	    token := jwt.New(jwt.SigningMethodHS256)
-	    claims := token.Claims.(jwt.MapClaims)
-	    claims["user_id"] = user.ID
-	    tokenString, err := token.SignedString([]byte("password")) 
-	
-	    if err != nil {
-	        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token"})
-	        return
-	    }
+	// Buat token JWT
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	tokenString, err := token.SignedString([]byte("password"))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token"})
+		return
+	}
 
 	loginResponse := response.UserLoginResponse{
 		Token: tokenString,
 	}
 
 	// return token
-	response := helper.APIResponse("ok", loginResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, loginResponse)
 }
 
 func (h *userController) UpdateUser(c *gin.Context) {
-    // Get user yang terotentikasi dari token JWT
-    user, err := GetUserFromToken(c)
-    if err != nil {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-        return
-    }
+	// Get user yang terotentikasi dari token JWT
+	user, err := GetUserFromToken(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
-    // Parse data permintaan update akun
-    var request input.UserUpdateInput
-    if err := c.ShouldBindJSON(&request); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
+	// Parse data permintaan update akun
+	var request input.UserUpdateInput
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-    // Update informasi akun user
-    user.Username = request.Username
-    user.Email = request.Email
+	// Update informasi akun user
+	user.Username = request.Username
+	user.Email = request.Email
 
-    // Lakukan update data user dalam database
+	// Lakukan update data user dalam database
 	_, err = h.userService.UpdateUser(user.ID, request)
 
 	if err != nil {
@@ -201,15 +199,15 @@ func (h *userController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-    // Response data user yang telah diperbarui
-    updateResponse := response.UserUpdateResponse{
-        ID:        user.ID,
-        Username:  user.Username,
-        Email:     user.Email,
-	Age:       user.Age,
-        UpdatedAt: user.UpdatedAt,
-    }
-    c.JSON(http.StatusCreated, updateResponse)
+	// Response data user yang telah diperbarui
+	updateResponse := response.UserUpdateResponse{
+		ID:        user.ID,
+		Username:  user.Username,
+		Email:     user.Email,
+		Age:       user.Age,
+		UpdatedAt: user.UpdatedAt,
+	}
+	c.JSON(http.StatusCreated, updateResponse)
 }
 
 func (h *userController) DeleteUser(c *gin.Context) {
@@ -234,6 +232,5 @@ func (h *userController) DeleteUser(c *gin.Context) {
 		Message: "Your account has been successfully deleted with id " + fmt.Sprint(userDelete.ID) + "!",
 	}
 
-	response := helper.APIResponse("ok", deleteResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, deleteResponse)
 }
