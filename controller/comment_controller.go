@@ -27,12 +27,12 @@ func NewCommentController(commentService service.CommentService, photoService se
 func (h *commentController) AddNewComment(c *gin.Context) {
 	var input input.CommentInput
 
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	err := c.ShouldBindJSON(&input)
 
@@ -65,18 +65,17 @@ func (h *commentController) AddNewComment(c *gin.Context) {
 		CreatedAt: newComment.CreatedAt,
 	}
 
-	response := helper.APIResponse("created", newCommentResponse)
-	c.JSON(http.StatusCreated, response)
+	c.JSON(http.StatusCreated, newCommentResponse)
 }
 
 // Delete Comment by id
 func (h *commentController) DeleteComment(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	var idCommentUri input.DeleteComment
 
@@ -114,18 +113,17 @@ func (h *commentController) DeleteComment(c *gin.Context) {
 		Message: "Your comment has been successfully deleted",
 	}
 
-	response := helper.APIResponse("ok", responseComment)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, responseComment)
 }
 
 // Get Comment All Comment
 func (h *commentController) GetComment(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	comments, err := h.commentService.GetComment(currentUser.ID)
 	if err != nil {
@@ -145,18 +143,17 @@ func (h *commentController) GetComment(c *gin.Context) {
 		allCommentsPhoto = append(allCommentsPhoto, allCommentsPhotoTmp)
 	}
 
-	response := helper.APIResponse("ok", allCommentsPhoto)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, allCommentsPhoto)
 }
 
 // Edit/Update Comment (message) by id
 func (h *commentController) UpdateComment(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	UpdateComment := input.CommentUpdateInput{}
 
@@ -212,6 +209,5 @@ func (h *commentController) UpdateComment(c *gin.Context) {
 		UpdatedAt: Updated.UpdatedAt,
 	}
 
-	response := helper.APIResponse("ok", responseComment)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, responseComment)
 }
