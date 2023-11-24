@@ -14,8 +14,8 @@ type commentService struct {
 }
 
 type CommentService interface {
+	GetCommentAll() ([]entity.Comment, error)
 	CreateComment(input input.CommentInput, idUser int) (entity.Comment, error)
-	GetComment(UserID int) ([]entity.Comment, error)
 	DeleteComment(id_user int, id_comment int) (entity.Comment, error)
 	UpdateComment(id_user int, id_comment int, input input.CommentUpdateInput) (entity.Comment, error)
 	GetCommentByID(commentID int) (entity.Comment, error)
@@ -51,8 +51,9 @@ func (s *commentService) CreateComment(input input.CommentInput, idUser int) (en
 	return createNewcomment, nil
 }
 
-func (s *commentService) GetComment(UserID int) ([]entity.Comment, error) {
-	comment, err := s.commentRepository.FindByUserID(UserID)
+func (s *photoService) GetCommentAll() ([]entity.Comment, error) {
+	comment, err := s.commentRepository.GetAll()
+
 	if err != nil {
 		return []entity.Comment{}, err
 	}
