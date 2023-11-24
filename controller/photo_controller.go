@@ -24,8 +24,8 @@ func NewPhotoController(photoService service.PhotoService, userService service.U
 func (h *photoController) AddNewPhoto(c *gin.Context) {
 	var input input.PhotoCreateInput
 
-	currentUser := c.MustGet("currentUser").(int)
-
+	    // Get user yang terotentikasi dari token JWT
+	    currentUser:= GetUserFromToken(c)
 	if currentUser == 0 {
 		response := helper.APIResponse("failed", "unauthorized user")
 		c.JSON(http.StatusUnauthorized, response)
