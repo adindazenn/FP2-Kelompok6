@@ -130,17 +130,27 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 		return
 	}
 
-	responseSocialMedia, err := response.GetAllSocialMedia(socialmedia, user)
-	if err != nil {
-		response := helper.APIResponse("failed", gin.H{
-			"errors": err.Error(),
-		})
-		c.JSON(http.StatusUnprocessableEntity, response)
-		return
-	}
+	var socialmediaResponse []SocialMediaGetResponse
+	for _, index := range socialmedia {
+		userTmp, _ := h.userService.GetUserByID(index.UserID)
+	
+		socialmediaResponseTmp := response.SocialMediaGetResponse{
+			ID:        index.ID,
+			Name:      index.Name,
+			URL:       index.URL,
+			UsedID:    index.UserID,
+			CreatedAt: index.CreatedAt,
+			UpdateAt:  index.UpdatedAt,
+			User: response.SocialMediaUser{
+				ID:       index.User.ID,
+				Username: index.User.Username,
+			},
+		}
+
+		socialmediaResponse = append(socialmediaResponse, socialmediaResponseTmp)
 
 	c.JSON(http.StatusOK, gin.H{
-		"social_medias": responseSocialMedia,
+		"social_medias": socialmediaResponse,
 	})
 }
 
