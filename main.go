@@ -48,8 +48,8 @@ func main() {
 	// Delete
 	router.POST("/users/register", userController.RegisterUser)
 	router.POST("/users/login", userController.Login)
-	router.PUT("/users", middleware.AuthMiddleware(), userController.UpdateUser)
-	router.DELETE("/users", middleware.AuthMiddleware(), userController.DeleteUser)
+	router.PUT("/users/:id", middleware.AuthMiddleware(), userController.UpdateUser)
+	router.DELETE("/users/:id", middleware.AuthMiddleware(), userController.DeleteUser)
 
 	// photos
 	router.POST("/photos", middleware.AuthMiddleware(), photoController.AddNewPhoto)
