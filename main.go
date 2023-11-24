@@ -6,7 +6,6 @@ import (
 
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/config"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/controller"
-	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/middleware"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/model/entity"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/repository"
 	"github.com/alifwildanaz/FP2-MSIB5-Hacktiv8/service"
@@ -48,27 +47,27 @@ func main() {
 	// Delete
 	router.POST("/users/register", userController.RegisterUser)
 	router.POST("/users/login", userController.Login)
-	router.PUT("/users", middleware.AuthMiddleware(), userController.UpdateUser)
-	router.DELETE("/users", middleware.AuthMiddleware(), userController.DeleteUser)
+	router.PUT("/users", userController.UpdateUser)
+	router.DELETE("/users", userController.DeleteUser)
 
 	// photos
-	router.POST("/photos", middleware.AuthMiddleware(), photoController.AddNewPhoto)
-	router.DELETE("/photos/:id", middleware.AuthMiddleware(), photoController.DeletePhoto)
-	router.GET("/photos", middleware.AuthMiddleware(), photoController.GetPhotos)
+	router.POST("/photos", photoController.AddNewPhoto)
+	router.DELETE("/photos/:id", photoController.DeletePhoto)
+	router.GET("/photos", photoController.GetPhotos)
 	router.GET("/photos/:id", photoController.GetPhoto)
-	router.PUT("/photos/:id", middleware.AuthMiddleware(), photoController.UpdatePhoto)
+	router.PUT("/photos/:id", photoController.UpdatePhoto)
 
 	// comments
-	router.POST("/comments", middleware.AuthMiddleware(), commentController.AddNewComment)
-	router.DELETE("/comments/:id", middleware.AuthMiddleware(), commentController.DeleteComment)
-	router.GET("/comments", middleware.AuthMiddleware(), commentController.GetComment)
-	router.PUT("/comments/:id", middleware.AuthMiddleware(), commentController.UpdateComment)
+	router.POST("/comments", commentController.AddNewComment)
+	router.DELETE("/comments/:id", commentController.DeleteComment)
+	router.GET("/comments", commentController.GetComment)
+	router.PUT("/comments/:id", commentController.UpdateComment)
 
 	// social media
-	router.POST("/socialmedias", middleware.AuthMiddleware(), socialmediaController.AddNewSocialMedia)
-	router.GET("/socialmedias", middleware.AuthMiddleware(), socialmediaController.GetSocialMedia)
-	router.PUT("/socialmedias/:id", middleware.AuthMiddleware(), socialmediaController.UpdateSocialMedia)
-	router.DELETE("/socialmedias/:id", middleware.AuthMiddleware(), socialmediaController.DeleteSocialmedia)
+	router.POST("/socialmedias", socialmediaController.AddNewSocialMedia)
+	router.GET("/socialmedias", socialmediaController.GetSocialMedia)
+	router.PUT("/socialmedias/:id", socialmediaController.UpdateSocialMedia)
+	router.DELETE("/socialmedias/:id", socialmediaController.DeleteSocialmedia)
 
 	router.Run(":" + os.Getenv("PORT"))
 
