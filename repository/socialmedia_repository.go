@@ -12,6 +12,7 @@ type SocialMediaRepository interface {
 	Update(socialmedia entity.SocialMedia, ID int) (entity.SocialMedia, error)
 	Delete(ID int) (entity.SocialMedia, error)
 	FindByID(ID int) (entity.SocialMedia, error)
+	GetAll() ([]entity.SocialMedia, error)
 }
 
 type socialmediaRepository struct {
@@ -20,6 +21,18 @@ type socialmediaRepository struct {
 
 func NewSocialMediaRepository(db *gorm.DB) *socialmediaRepository {
 	return &socialmediaRepository{db}
+}
+
+func (r *socialmediaRepository) GetAll() ([]entity.SocialMedia, error) {
+	var socialmedias []entity.SocialMedia
+
+	err := r.db.Find(&socialmedias).Error
+
+	if err != nil {
+		return []entity.SocialMedia{}, err
+	}
+
+	return socialmedias, nil
 }
 
 func (r *socialmediaRepository) Save(socialmedia entity.SocialMedia) (entity.SocialMedia, error) {
