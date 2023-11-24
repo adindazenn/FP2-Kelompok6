@@ -25,13 +25,12 @@ func NewSocialMediaController(socialmediaService service.SocialMediaService, use
 func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 	var input input.SocialInput
 
-	currentUser := c.MustGet("currentUser").(int)
-
-	if currentUser == 0 {
-		response := helper.APIResponse("failed", "unauthorized user")
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
+	    // Get user yang terotentikasi dari token JWT
+	    currentUser, err := GetUserFromToken(c)
+	    if err != nil {
+	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+	        return
+	    }
 
 	err := c.ShouldBindJSON(&input)
 
@@ -69,13 +68,12 @@ func (h *socialmediaController) AddNewSocialMedia(c *gin.Context) {
 
 // Delete Social Media by id
 func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(int)
-
-	if currentUser == 0 {
-		response := helper.APIResponse("failed", "unauthorized user")
-		c.JSON(http.StatusUnauthorized, response)
-		return
-	}
+	    // Get user yang terotentikasi dari token JWT
+	    currentUser, err := GetUserFromToken(c)
+	    if err != nil {
+	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+	        return
+	    }
 
 	var idSocialMediaUri input.DeleteSocialMedia
 
@@ -119,13 +117,12 @@ func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 
 // Get All Social Medias
 func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(int)
-
-	if currentUser == 0 {
-		response := helper.APIResponse("failed", "id must be exist!")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
+	    // Get user yang terotentikasi dari token JWT
+	    currentUser, err := GetUserFromToken(c)
+	    if err != nil {
+	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+	        return
+	    }
 
 	socialmedia, err := h.socialmediaService.GetSocialMedia(currentUser)
 	if err != nil {
@@ -161,13 +158,12 @@ func (h *socialmediaController) GetSocialMedia(c *gin.Context) {
 
 // Edit/Update Social Media (Name or URL)
 func (h *socialmediaController) UpdateSocialMedia(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(int)
-
-	if currentUser == 0 {
-		response := helper.APIResponse("failed", "id must be exist!")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response)
-		return
-	}
+	    // Get user yang terotentikasi dari token JWT
+	    currentUser, err := GetUserFromToken(c)
+	    if err != nil {
+	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+	        return
+	    }
 
 	update := input.SocialInput{}
 
