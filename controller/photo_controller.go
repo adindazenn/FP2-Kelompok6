@@ -24,12 +24,12 @@ func NewPhotoController(photoService service.PhotoService, userService service.U
 func (h *photoController) AddNewPhoto(c *gin.Context) {
 	var input input.PhotoCreateInput
 
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	err := c.ShouldBindJSON(&input)
 
@@ -55,24 +55,24 @@ func (h *photoController) AddNewPhoto(c *gin.Context) {
 	}
 
 	newPhotoResponse := response.CreatePhotoResponse{
-		ID:       newPhoto.ID,
-		Title:    newPhoto.Title,
-		Caption:  newPhoto.Caption,
-		PhotoURL: input.PhotoURL,
-		UserID:   currentUser.ID,
+		ID:        newPhoto.ID,
+		Title:     newPhoto.Title,
+		Caption:   newPhoto.Caption,
+		PhotoURL:  input.PhotoURL,
+		UserID:    currentUser.ID,
+		CreatedAt: newPhoto.CreatedAt,
 	}
 
-	response := helper.APIResponse("created", newPhotoResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, newPhotoResponse)
 }
 
 func (h *photoController) DeletePhoto(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	var idPhotoUri input.PhotoDeleteIDUser
 
@@ -109,17 +109,16 @@ func (h *photoController) DeletePhoto(c *gin.Context) {
 		Message: "Your photo has been successfully deleted",
 	}
 
-	response := helper.APIResponse("ok", deleteResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, deleteResponse)
 }
 
 func (h *photoController) GetPhotos(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    _, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	_, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	photos, err := h.photoService.GetPhotosAll()
 	if err != nil {
@@ -153,8 +152,7 @@ func (h *photoController) GetPhotos(c *gin.Context) {
 		photoResponse = append(photoResponse, photoResponseTmp)
 	}
 
-	response := helper.APIResponse("ok", photoResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, photoResponse)
 }
 
 func (h *photoController) GetPhoto(c *gin.Context) {
@@ -210,17 +208,16 @@ func (h *photoController) GetPhoto(c *gin.Context) {
 		},
 	}
 
-	response := helper.APIResponse("ok", photoResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, photoResponse)
 }
 
 func (h *photoController) UpdatePhoto(c *gin.Context) {
-	    // Get user yang terotentikasi dari token JWT
-	    currentUser, tokenErr := GetUserFromToken(c)
-	    if tokenErr != nil {
-	        c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
-	        return
-	    }
+	// Get user yang terotentikasi dari token JWT
+	currentUser, tokenErr := GetUserFromToken(c)
+	if tokenErr != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Autentikasi gagal"})
+		return
+	}
 
 	updatePhoto := input.PhotoUpdateInput{}
 
@@ -272,6 +269,5 @@ func (h *photoController) UpdatePhoto(c *gin.Context) {
 		UpdatedAt: photoUpdated.UpdatedAt,
 	}
 
-	response := helper.APIResponse("ok", photoResponse)
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, photoResponse)
 }
