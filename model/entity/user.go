@@ -6,8 +6,8 @@ import (
 
 type User struct {
 	ID        int       `gorm:"primaryKey"`
-	Username  string    
-	Email     string    `gorm:"unique"`
+	Username  string    `gorm:"uniqueIndex"`
+	Email     string    `gorm:"uniqueIndex"`
 	Password  string    
 	Age       int    
 	CreatedAt time.Time 
