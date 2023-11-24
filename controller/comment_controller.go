@@ -20,8 +20,8 @@ type commentController struct {
 	userService    service.UserService
 }
 
-func NewCommentController(commentService service.CommentService, photoService service.PhotoService) *commentController {
-	return &commentController{commentService, photoService}
+func NewCommentController(commentService service.CommentService, photoService service.PhotoService, userService service.UserService) *commentController {
+	return &commentController{commentService, photoService, userService}
 }
 
 // Post New Comment
