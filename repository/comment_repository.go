@@ -96,7 +96,7 @@ func (r *commentRepository) FindByPhotoID(IDPhoto int) ([]entity.Comment, error)
 func (r *commentRepository) GetAll() ([]entity.Comment, error) {
 	var comments []entity.Comment
 
-	err := r.db.Preload("Comment").Find(&comments).Error
+	err := r.db.Find(&comments).Error
 
 	if err != nil {
 		return []entity.Comment{}, err
