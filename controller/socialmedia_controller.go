@@ -75,8 +75,6 @@ func (h *socialmediaController) DeleteSocialmedia(c *gin.Context) {
 
 	var idSocialMediaUri input.DeleteSocialMedia
 
-	err := c.ShouldBindUri(&idSocialMediaUri)
-
 	socialmedia, err := govalidator.ValidateStruct(idSocialMediaUri)
 
 	if !socialmedia {
