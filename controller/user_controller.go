@@ -152,17 +152,19 @@ func (h *userController) Login(c *gin.Context) {
 		return
 	}
 
-	// create token
-	jwtService := middleware.NewService()
-	token, err := jwtService.GenerateToken(user.ID)
-	if err != nil {
-		response := helper.APIResponse("failed", "failed to generate token!")
-		c.JSON(http.StatusBadRequest, response)
-		return
-	}
+	    // Buat token JWT
+	    token := jwt.New(jwt.SigningMethodHS256)
+	    claims := token.Claims.(jwt.MapClaims)
+	    claims["user_id"] = user.ID
+	    tokenString, err := token.SignedString([]byte("password")) 
+	
+	    if err != nil {
+	        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat token"})
+	        return
+	    }
 
 	loginResponse := response.UserLoginResponse{
-		Token: token,
+		Token: tokenString,
 	}
 
 	// return token
