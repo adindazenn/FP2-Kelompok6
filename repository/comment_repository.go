@@ -17,6 +17,7 @@ type CommentRepository interface {
 	Update(comment entity.Comment, ID int) (entity.Comment, error)
 	FindByID(ID int) (entity.Comment, error)
 	FindByPhotoID(IDPhoto int) ([]entity.Comment, error)
+	GetAll() ([]entity.Comment, error)
 }
 
 func NewCommentRepository(db *gorm.DB) *commentRepository {
@@ -84,6 +85,18 @@ func (r *commentRepository) Update(comment entity.Comment, ID int) (entity.Comme
 func (r *commentRepository) FindByPhotoID(IDPhoto int) ([]entity.Comment, error) {
 	var comments []entity.Comment
 	err := r.db.Where("photo_id = ?", IDPhoto).Find(&comments).Error
+
+	if err != nil {
+		return []entity.Comment{}, err
+	}
+
+	return comments, nil
+}
+
+func (r *commentRepository) GetAll() ([]entity.Comment, error) {
+	var comments []entity.Comment
+
+	err := r.db.Preload("Comment").Find(&comments).Error
 
 	if err != nil {
 		return []entity.Comment{}, err
