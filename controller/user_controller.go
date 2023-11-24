@@ -28,12 +28,7 @@ func NewUserController(userService service.UserService) *userController {
 }
 
 func GetUserFromToken(c *gin.Context) (*entity.User, error) {
-    db, err := config.InitDB()
-    if err != nil {
-        fmt.Println("Error initializing database:", err)
-        return nil, err
-    }
-    
+    db := config.InitDB()    
     // Mendapatkan token dari header Authorization
     authHeader := c.GetHeader("Authorization")
     if authHeader == "" {
