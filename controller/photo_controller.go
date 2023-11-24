@@ -44,7 +44,7 @@ func (h *photoController) AddNewPhoto(c *gin.Context) {
 	}
 
 	// send to service
-	newPhoto, err := h.photoService.CreatePhoto(input, currentUser)
+	newPhoto, err := h.photoService.CreatePhoto(input, currentUser.ID)
 
 	if err != nil {
 		response := helper.APIResponse("failed", gin.H{
@@ -59,7 +59,7 @@ func (h *photoController) AddNewPhoto(c *gin.Context) {
 		Title:    newPhoto.Title,
 		Caption:  newPhoto.Caption,
 		PhotoURL: input.PhotoURL,
-		UserID:   currentUser,
+		UserID:   currentUser.ID,
 	}
 
 	response := helper.APIResponse("created", newPhotoResponse)
