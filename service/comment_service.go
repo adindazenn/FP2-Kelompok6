@@ -51,7 +51,7 @@ func (s *commentService) CreateComment(input input.CommentInput, idUser int) (en
 	return createNewcomment, nil
 }
 
-func (s *photoService) GetCommentAll() ([]entity.Comment, error) {
+func (s *commentService) GetCommentAll() ([]entity.Comment, error) {
 	comment, err := s.commentRepository.GetAll()
 
 	if err != nil {
